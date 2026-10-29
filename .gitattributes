@@ -1,0 +1,4 @@
+# Shell scripts must keep LF line endings, also on Windows checkouts
+* text=auto eol=lf
+*.png binary
+*.jpg binary

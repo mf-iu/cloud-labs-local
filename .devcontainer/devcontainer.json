@@ -1,0 +1,51 @@
+// Dev container for the labs of the cloud computing course, without the CLI
+// of a cloud provider: for the local labs, or before the cloud account exists.
+// The provider repositories have their own devcontainer.json; it builds the
+// Dockerfile next to this file and adds the provider's CLI.
+// Open this folder from WSL in VS Code and choose "Reopen in Container".
+// The first start builds the image and takes several minutes.
+{
+  "name": "Cloud-Kurs: lokal",
+  "build": { "dockerfile": "Dockerfile" },
+
+  // The parent folder is mounted, so that PlaceFinder and the other
+  // repositories next to this one are available in the container, too.
+  "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces,type=bind",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+  "features": {
+    // Own Docker Engine inside the container (Docker in Docker)
+    "ghcr.io/devcontainers/features/docker-in-docker:4": { "moby": false },
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": { "minikube": "none" },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  // SSH keys stay in WSL and survive a rebuild of the container
+  "initializeCommand": "mkdir --parents \"$HOME/.ssh\"",
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind"
+  ],
+
+  "remoteUser": "vscode",
+  "containerEnv": {
+    // The uv cache and the projects are on different file systems
+    "UV_LINK_MODE": "copy"
+  },
+  "forwardPorts": [8000],
+  "portsAttributes": { "8000": { "label": "PlaceFinder" } },
+
+  // Shows the versions of all tools; run it again at any time
+  "postCreateCommand": "tools/check-tools.sh",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "redhat.vscode-yaml",
+        "timonwong.shellcheck",
+        "opentofu.vscode-opentofu"
+      ]
+    }
+  }
+}

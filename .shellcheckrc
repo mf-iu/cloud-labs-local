@@ -1,0 +1,4 @@
+external-sources=true
+source-path=SCRIPTDIR
+# Variables of the state files are loaded at run time (load_state)
+disable=SC2153

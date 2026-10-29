@@ -1,0 +1,20 @@
+# Helm values for Traefik as the Gateway API implementation of cluster pf.
+# Traefik creates the GatewayClass "traefik"; the Gateway itself comes from
+# gateway.yaml. HTTPS arrives on node port 30443 of the server node, to which
+# cluster-up.sh maps port 8443 of the dev container.
+providers:
+  kubernetesGateway:
+    enabled: true
+  kubernetesIngress:
+    enabled: false          # the course uses the Gateway API only
+gateway:
+  enabled: false            # no default Gateway of the chart: gateway.yaml
+service:
+  spec:
+    type: NodePort          # no load balancer in the cluster (ServiceLB is off)
+ports:
+  web:
+    expose:
+      default: false        # HTTPS only
+  websecure:
+    nodePort: 30443         # entrypoint port 8443 inside the pod, as in gateway.yaml

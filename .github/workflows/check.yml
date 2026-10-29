@@ -1,0 +1,23 @@
+# Checks on every push and pull request: ShellCheck for all shell scripts
+# and the check that this repository names no cloud provider
+# (tools/check-neutral.sh). Actions are pinned to the commit of a release,
+# as in the pipeline of PlaceFinder.
+name: check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: ShellCheck
+        run: git ls-files '*.sh' | xargs shellcheck
+      - name: No provider references
+        run: tools/check-neutral.sh

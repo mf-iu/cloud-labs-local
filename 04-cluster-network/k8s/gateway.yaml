@@ -1,0 +1,19 @@
+# Entry into the cluster: HTTPS for placefinder.test, TLS ends here.
+# The annotation lets cert-manager create the certificate in secret pf-tls.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: web
+  annotations:
+    cert-manager.io/cluster-issuer: course-ca
+spec:
+  gatewayClassName: traefik
+  listeners:
+    - name: https
+      protocol: HTTPS
+      port: 8443                  # entrypoint websecure of Traefik (traefik-values.yaml)
+      hostname: placefinder.test
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: pf-tls

@@ -1,0 +1,28 @@
+# Extra task: first deny all incoming traffic to the pods of the namespace,
+# then allow PlaceFinder port 8000 from the namespace of Traefik only.
+# k3s enforces NetworkPolicies with its built-in policy controller.
+# Apply:  kubectl apply --filename k8s/networkpolicies.yaml
+# Remove: kubectl delete --filename k8s/networkpolicies.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+spec:
+  podSelector: {}                 # all pods in the namespace
+  policyTypes: [Ingress]          # no ingress rules: nothing incoming allowed
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: placefinder-from-gateway
+spec:
+  podSelector:
+    matchLabels: {app: placefinder}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: traefik   # Traefik runs here
+      ports:
+        - port: 8000

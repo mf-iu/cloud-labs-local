@@ -1,0 +1,10 @@
+# Issues certificates signed by the course CA. gateway-up.sh stores the CA's
+# key pair in the secret course-ca in the namespace cert-manager. A public
+# service would use an ACME issuer such as Let's Encrypt instead.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: course-ca
+spec:
+  ca:
+    secretName: course-ca

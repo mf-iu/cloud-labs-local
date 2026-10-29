@@ -1,0 +1,20 @@
+# Personal settings, created state, downloads and the course CA
+config.env
+.state/
+
+# OpenTofu (08-iac-and-operations keeps its state in the folder)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+
+# Build output and downloads
+build/
+out/
+*.zip
+*.parquet
+*.pmtiles
+__pycache__/
+.ruff_cache/
+.venv/
