@@ -4,6 +4,8 @@ variable "placefinder_image" {
   default     = "placefinder:0.8.0"
 }
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 variable "instances" {
   description = "Number of PlaceFinder containers, on ports 8101, 8102 ..."
   type        = number
@@ -14,6 +16,8 @@ variable "instances" {
     error_message = "Between 1 and 5 instances, please."
   }
 }
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 variable "cache_ttl" {
   description = "Seconds a search stays in the cache (CACHE_TTL)"

@@ -15,32 +15,30 @@ LIMIT 10;
 --    has the trigram index, which also answers "="). The index is created
 --    inside a transaction and rolled back, so the comparison can be repeated.
 EXPLAIN ANALYZE
-SELECT name, population FROM places WHERE asciiname = 'Erfurt';
+    SELECT name, population FROM places WHERE asciiname = 'Erfurt';
+
 BEGIN;
-CREATE INDEX places_asciiname_idx ON places (asciiname);
-EXPLAIN ANALYZE
-SELECT name, population FROM places WHERE asciiname = 'Erfurt';
+    CREATE INDEX places_asciiname_idx ON places (asciiname);
+
+    EXPLAIN ANALYZE
+        SELECT name, population FROM places WHERE asciiname = 'Erfurt';
 ROLLBACK;
 
 -- 3. Places within 50 km, with the query plan (uses places_geom_idx)
 EXPLAIN ANALYZE
-SELECT name, population
-FROM places
-WHERE ST_DWithin(geom, ST_MakePoint(11.03, 50.98)::geography, 50000);
+    SELECT name, population FROM places
+    WHERE ST_DWithin(geom, ST_MakePoint(11.03, 50.98)::geography, 50000);
 
 -- 4. Same radius query without index, for comparison
 SET enable_indexscan = off;
 SET enable_bitmapscan = off;
 EXPLAIN ANALYZE
-SELECT name, population
-FROM places
-WHERE ST_DWithin(geom, ST_MakePoint(11.03, 50.98)::geography, 50000);
+    SELECT name, population FROM places
+    WHERE ST_DWithin(geom, ST_MakePoint(11.03, 50.98)::geography, 50000);
 RESET enable_indexscan;
 RESET enable_bitmapscan;
 
 -- 5. Fuzzy search with trigrams: finds "Würzburg" for "Wuerzburg"
-SELECT name, country_code, similarity(name, 'Wuerzburg') AS score
-FROM places
+SELECT name, country_code, similarity(name, 'Wuerzburg') AS score FROM places
 WHERE name % 'Wuerzburg'
-ORDER BY score DESC
-LIMIT 5;
+ORDER BY score DESC LIMIT 5;

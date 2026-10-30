@@ -2,22 +2,31 @@
 # described as code instead of compose.yaml. The same workflow as in the
 # cloud - init, plan, apply, destroy - without costs and without an account.
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 resource "docker_network" "placefinder" {
   name = "pf-t08"
 }
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 resource "docker_image" "valkey" {
   name         = "valkey/valkey:9.0"
   keep_locally = true # destroy removes the container, not the image
 }
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 resource "docker_container" "valkey" {
   name  = "pf-t08-valkey"
   image = docker_image.valkey.image_id
   # a cache: memory only, at most 64 MB, least recently used keys go first
   command = [
-    "valkey-server", "--save", "", "--appendonly", "no",
-    "--maxmemory", "64mb", "--maxmemory-policy", "allkeys-lru",
+    "valkey-server",
+    "--save", "",
+    "--appendonly", "no",
+    "--maxmemory", "64mb",
+    "--maxmemory-policy", "allkeys-lru",
   ]
 
   networks_advanced {
@@ -25,10 +34,14 @@ resource "docker_container" "valkey" {
   }
 }
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 resource "docker_image" "placefinder" {
   name         = var.placefinder_image
   keep_locally = true
 }
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 resource "docker_container" "placefinder" {
   count = var.instances

@@ -1,0 +1,2 @@
+# Formatting and lint rules for local-s3.py, as in PlaceFinder
+line-length = 100

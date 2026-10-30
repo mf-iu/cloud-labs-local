@@ -19,10 +19,10 @@ Im Ubuntu-Terminal von WSL, nicht im Container:
 ```bash
 mkdir --parents ~/kurs && cd ~/kurs
 git clone https://github.com/mf-iu/cloud-labs-local.git
-git clone https://github.com/mf-iu/cloud-labs-<anbieter>.git    # Repository des eigenen Anbieters
-git clone https://github.com/<github-user>/placefinder.git       # eigener Fork
+git clone https://github.com/mf-iu/cloud-labs-<anbieter>.git        # Repository des eigenen Anbieters
+git clone https://github.com/<github-user>/placefinder.git          # eigener Fork
 cd placefinder
-git remote add upstream https://github.com/mf-iu/placefinder.git   # die Musterlösungen
+git remote add upstream https://github.com/mf-iu/placefinder.git    # die Musterlösungen
 git fetch upstream --tags
 ```
 
@@ -36,7 +36,7 @@ Welchen Ordner öffnen?
 
 | Ordner | Dev Container | wann |
 |---|---|---|
-| `cloud-labs-<anbieter>` | „Cloud-Kurs: <Anbieter>“: alle Werkzeuge und die CLI des Anbieters | Regelfall ab Termin 1 |
+| `cloud-labs-<anbieter>` | „Cloud-Kurs: \<Anbieter\>“: alle Werkzeuge und die CLI des Anbieters | Regelfall ab Termin 1 |
 | `cloud-labs-local` | „Cloud-Kurs: lokal“: alle Werkzeuge ohne Anbieter-CLI, schneller gebaut | ohne Cloud-Konto |
 
 Beide bauen dasselbe Dockerfile aus `cloud-labs-local/.devcontainer/`; das Anbieter-Repository ergänzt nur seine CLI und hängt deren Anmeldedaten ein.
