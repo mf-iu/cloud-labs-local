@@ -71,10 +71,12 @@ else
     log "Creating cluster $CLUSTER with 1 server and $agents agents ($K3S_IMAGE) ..."
     # --no-lb: no load balancer container in front of the API, one server is
     # enough; the port goes straight to the server node
-    # --port host:node@server:0 forwards port 8443 of the dev container to node
-    # port 30443 of the first server node
+    # --port host:node@server:0:direct forwards port 8443 of the dev container
+    # to node port 30443 of the first server node. "direct" publishes the port
+    # on that node's container; the default "proxy" would need the load
+    # balancer that --no-lb switches off.
     k3d cluster create "$CLUSTER" --agents "$agents" --image "$K3S_IMAGE" --no-lb "${K3S_ARGS[@]}" \
-                                  --port "$HTTPS_PORT:$GATEWAY_NODE_PORT@server:0"
+                                  --port "$HTTPS_PORT:$GATEWAY_NODE_PORT@server:0:direct"
 fi
 
 kubectl config use-context "k3d-$CLUSTER" >/dev/null

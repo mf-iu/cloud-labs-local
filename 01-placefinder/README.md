@@ -28,8 +28,8 @@ In einem zweiten Terminal (Stand `t01`, Version 0 der API):
 
 ```bash
 curl "http://localhost:8000/places?q=Erfurt"
-curl "http://localhost:8000/places?q=München&limit=3"   # findet Munich über die alternativen Namen
-curl http://localhost:8000/                             # Name, Version, Quellenangabe
+curl "http://localhost:8000/places?q=M%C3%BCnchen&limit=3"   # findet Munich über die alternativen Namen
+curl http://localhost:8000/                                  # Name, Version, Quellenangabe
 ```
 
 Die interaktive API-Dokumentation steht unter http://localhost:8000/docs; VS Code leitet den Port aus dem Dev Container weiter. Ab Tag `t05` gibt es die REST-API v1 unter `/v1/places` (README von PlaceFinder, Abschnitt *REST-API v1*).
