@@ -11,7 +11,8 @@
 #   maxzoom  highest zoom level in the file (default 14); the map shows
 #            higher levels by scaling the tiles of level 14
 #
-# Map data © OpenStreetMap contributors (ODbL), tiles by Protomaps.
+# Map data © OpenStreetMap contributors (Open Database License, ODbL), tiles by
+# Protomaps.
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

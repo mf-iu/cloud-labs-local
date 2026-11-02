@@ -1,6 +1,6 @@
 -- Example queries for step 06-postgis. Run with: psql "$DATABASE_URL" -f queries.sql
--- No JIT compilation and no parallel workers: simpler plans that are easier
--- to compare.
+-- No Just-In-Time (JIT) compilation and no parallel workers: simpler plans that
+-- are easier to compare.
 SET jit = off;
 SET max_parallel_workers_per_gather = 0;
 \timing on

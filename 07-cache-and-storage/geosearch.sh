@@ -61,7 +61,8 @@ file="$(download_cities)"
 log "Loading $(wc --lines <"$file") places into $KEY with GEOADD ..."
 vcli del "$KEY" >/dev/null
 
-# mass insertion: all commands in the protocol of Valkey (RESP) in one stream
+# mass insertion: all commands in the protocol of Valkey (Redis Serialization
+# Protocol, RESP) in one stream
 # python3 - reads the program from stdin, here the heredoc up to PYTHON; the
 # arguments after - are sys.argv[1:]. valkey-cli --pipe sends the generated
 # commands to Valkey in one go.

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # Check that this repository stays independent of the cloud providers: no
-# provider names, CLIs, SDKs or addresses in scripts, configuration or text.
+# provider names, CLIs, Software Development Kits (SDKs) or addresses in
+# scripts, configuration or text.
 # Everything that knows a provider belongs into that provider's repository.
 # The only exception is the note on Overture Maps in 10-analytics: its data
 # lies in a public bucket of a provider and needs no account.

@@ -2,8 +2,9 @@
 
 # Remove what gateway-up.sh added to cluster pf: Gateway, HTTPRoute, issuer,
 # NetworkPolicies, cert-manager and Traefik. The cluster and PlaceFinder
-# stay; ../03-kubernetes/cluster-down.sh deletes everything. The course CA
-# stays in .state for the next run; it is valid for 30 days.
+# stay; ../03-kubernetes/cluster-down.sh deletes everything. The course
+# Certificate Authority (CA) stays in .state for the next run; it is valid for
+# 30 days.
 #
 # Usage: ./gateway-down.sh
 

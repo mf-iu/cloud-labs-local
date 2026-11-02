@@ -70,6 +70,7 @@ Server           %{remote_ip} port %{remote_port}, HTTP/%{http_version}, status 
 
 section "TLS certificate chain (openssl s_client)"
 # s_client opens a TLS connection; </dev/null ends it right away. -servername
-# sends the host name (SNI), -showcerts prints the whole chain.
+# sends the host name (Server Name Indication, SNI), -showcerts prints the whole
+# chain.
 openssl s_client -connect "$host:443" -servername "$host" -showcerts </dev/null 2>/dev/null \
     | grep --extended-regexp 'Protocol|Cipher|^ *[0-9] s:|^ *i:|^ *v:' | first 16 || true

@@ -2,13 +2,15 @@
 
 # Check the REST API of PlaceFinder (tag t05 or later) against a base URL:
 # GeoJSON, filters, pagination, caching headers, conditional requests,
-# problem details (RFC 9457), CORS and the deprecation of version 0.
+# problem details (RFC 9457), Cross-Origin Resource Sharing (CORS) and the
+# deprecation of version 0.
 # Only GET requests, so it is safe against every instance.
 #
 # Usage: tools/smoke-test.sh [options] [base url]
 #   base url   default: http://localhost:8000, the local server
 #   --header   send this header with every request, e.g. an API key
-#   --cacert   trust the certificates of this CA, e.g. the course CA
+#   --cacert   trust the certificates of this Certificate Authority (CA), e.g.
+#              the course CA
 #   --resolve  host:port:address, as with curl, for a name without DNS entry
 #
 # Examples: tools/smoke-test.sh

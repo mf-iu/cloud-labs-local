@@ -3,11 +3,13 @@
 # dependencies = ["minio>=7.2.15,<8"]
 # ///
 """S3 client for the local object storage: SeaweedFS, service seaweedfs in
-compose.yaml of PlaceFinder (from tag t07). Every store with the S3 API
-works the same way; the endpoint and the keys come from the environment.
+compose.yaml of PlaceFinder (from tag t07). Every store with the Simple Storage
+Service (S3) API works the same way; the endpoint and the keys come from the
+environment.
 
 Usage: uv run local-s3.py <command>   (--help for details)
-  setup                  CORS for the map and a lifecycle rule for raw/
+  setup                  Cross-Origin Resource Sharing (CORS) for the map and a
+                         lifecycle rule for raw/
   upload FILE [KEY]      upload a file; default key raw/<name>, tiles/ for .pmtiles
   list                   objects in the bucket
   presign KEY [SECONDS]  pre-signed URL (default 3600 s), tested without
@@ -52,8 +54,8 @@ MAP_ORIGIN = "http://localhost:5173"  # frontend/index.html of PlaceFinder
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# the map reads PMTiles with range requests and needs ETag and Content-Range
-# in the answer
+# the map reads PMTiles with range requests and needs Entity Tag (ETag) and
+# Content-Range in the answer
 CORS_RULE = {
     "AllowedOrigin": MAP_ORIGIN,
     "AllowedMethod": ["GET", "HEAD"],

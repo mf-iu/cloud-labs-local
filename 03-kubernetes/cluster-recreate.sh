@@ -9,9 +9,9 @@
 # ran before; Helm releases and the autoscaler are not. It also deletes the
 # cluster net of the earlier gateway demo, which holds port 8443.
 #
-# Usage: ./cluster-recreate.sh [--force] [agents]
-#   --force   create the cluster anew even if it matches
-#   agents    number of agents, default: as many as the cluster has now
+# Usage: ./cluster-recreate.sh [--force] [number_of_agents]
+#   --force           create the cluster anew even if it matches
+#   number_of_agents  number of agents, default: as many as the cluster has now
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -27,16 +27,16 @@ GATEWAY_NODE_PORT=30443
 # Absolute path of the folder of this script
 HERE=$(cd "$(dirname "$0")" && pwd)
 MANIFEST="$PLACEFINDER_DIR/deploy/k8s/placefinder.yaml"
-USAGE="Usage: ./cluster-recreate.sh [--force] [agents]"
+USAGE="Usage: ./cluster-recreate.sh [--force] [number_of_agents]"
 force=0
-agents=""
+number_of_agents=""
 # Go through the arguments one by one: case runs the branch whose pattern
 # matches $1 (* matches anything), shift moves on to the next argument.
 while (( $# )); do
     case "$1" in
         --force) force=1 ;;
         -*) die "Unknown option $1. $USAGE" ;;
-        *) [[ "$1" =~ ^[0-9]+$ ]] || die "$USAGE"; agents=$1 ;;
+        *) [[ "$1" =~ ^[0-9]+$ ]] || die "$USAGE"; number_of_agents=$1 ;;
     esac
     shift
 done
@@ -64,8 +64,9 @@ fi
 if ! k3d_cluster_exists "$CLUSTER"; then
     log "No cluster $CLUSTER yet; creating it."
     # exec replaces this script by cluster-up.sh, nothing after this line runs.
-    # ${agents:+"$agents"} passes the number only if one was given.
-    exec "$HERE/cluster-up.sh" ${agents:+"$agents"}
+    # ${number_of_agents:+"$number_of_agents"} passes the number only if one was
+    # given.
+    exec "$HERE/cluster-up.sh" ${number_of_agents:+"$number_of_agents"}
 fi
 
 # mapfile reads each line of the output into an element of the array problems;
@@ -87,8 +88,9 @@ done
 # 3 What runs in it now: agents, PlaceFinder, Helm releases
 # Count the containers of the cluster with the role agent (--quiet prints only
 # their ids, one per line)
-agents=${agents:-$(docker ps --all --quiet --filter "label=k3d.cluster=$CLUSTER" \
-                             --filter "label=k3d.role=agent" | wc --lines)}
+number_of_agents=${number_of_agents:-$(docker ps --all --quiet \
+                                       --filter "label=k3d.cluster=$CLUSTER" \
+                                       --filter "label=k3d.role=agent" | wc --lines)}
 redeploy=false
 releases=""
 
@@ -110,7 +112,7 @@ else
 fi
 
 echo
-echo "Cluster $CLUSTER will be deleted and created anew with $agents agents."
+echo "Cluster $CLUSTER will be deleted and created anew with $number_of_agents agents."
 # redeploy is true or false, which are also the names of commands that succeed
 # or fail
 if $redeploy; then
@@ -130,7 +132,7 @@ confirm "Continue?" || exit 0
 # ASSUME_YES=1 for this command only: cluster-down.sh does not ask again
 ASSUME_YES=1 "$HERE/cluster-down.sh"
 
-"$HERE/cluster-up.sh" "$agents" >/dev/null
+"$HERE/cluster-up.sh" "$number_of_agents" >/dev/null
 
 problems=()
 mapfile -t problems < <(k3d_cluster_problems "$CLUSTER" "$HTTPS_PORT" "$GATEWAY_NODE_PORT")

@@ -2,9 +2,9 @@
 
 # Rebuild the demo of session 4 in the local k3d cluster pf: PlaceFinder over
 # HTTPS through the Gateway API, implemented by Traefik, with a certificate
-# that cert-manager issues from a course CA of your own. Costs nothing,
-# everything runs in the Docker Engine of the dev container. Safe to run
-# again.
+# that cert-manager issues from a course Certificate Authority (CA) of your own.
+# Costs nothing, everything runs in the Docker Engine of the dev container. Safe
+# to run again.
 #
 # Usage: ./gateway-up.sh
 
@@ -64,8 +64,9 @@ kubectl config use-context "k3d-$CLUSTER" >/dev/null
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# 2 Gateway API: the resource types (CRDs) come from the Kubernetes project,
-# the implementation from Traefik, which creates the GatewayClass traefik
+# 2 Gateway API: the resource types (Custom Resource Definitions, CRDs) come
+# from the Kubernetes project, the implementation from Traefik, which creates
+# the GatewayClass traefik
 log "Installing the Gateway API $GATEWAY_API_VERSION (CRDs) ..."
 # --server-side: the API server merges the objects itself. Client-side apply
 # keeps a copy of each object in an annotation, which is too large for these
@@ -102,7 +103,8 @@ kubectl apply --filename "$PLACEFINDER_DIR/deploy/k8s/"
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# 4 cert-manager with Gateway API support, from its OCI registry
+# 4 cert-manager with Gateway API support, from its Open Container Initiative
+# (OCI) registry
 log "Installing cert-manager $CERT_MANAGER_VERSION (takes a minute) ..."
 helm upgrade --install cert-manager oci://quay.io/jetstack/charts/cert-manager \
              --version "$CERT_MANAGER_VERSION" \
@@ -120,8 +122,9 @@ new_ca=false
 # (a day)
 if [[ ! -f "$CA_CERT" ]] || ! openssl x509 -checkend 86400 -noout -in "$CA_CERT" >/dev/null; then
     log "Creating the course CA in .state/course-ca.crt ..."
-    # A self-signed certificate (-x509) with a new EC key; -nodes leaves the key
-    # without a password, -addext marks the certificate as a CA.
+    # A self-signed certificate (-x509) with a new Elliptic Curve (EC) key;
+    # -nodes leaves the key without a password, -addext marks the certificate as
+    # a CA.
     openssl req -x509 \
                 -newkey ec \
                 -pkeyopt ec_paramgen_curve:P-256 \

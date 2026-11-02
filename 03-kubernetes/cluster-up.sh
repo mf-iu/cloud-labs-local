@@ -6,7 +6,7 @@
 # switched on (see K3S_ARGS). Port 8443 leads to the gateway that
 # ../04-cluster-network/gateway-up.sh adds later.
 #
-# Usage: ./cluster-up.sh [agents]   (default: 2)
+# Usage: ./cluster-up.sh [number_of_agents]   (default: 2)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -24,7 +24,7 @@ K3S_IMAGE="${K3S_IMAGE:-rancher/k3s:v1.36.5-k3s1}"
 HTTPS_PORT=8443
 GATEWAY_NODE_PORT=30443
 
-agents="${1:-2}"
+number_of_agents="${1:-2}"
 
 # Kept: CoreDNS (service names),
 #       metrics-server (kubectl top, autoscaler),
@@ -42,7 +42,8 @@ K3S_ARGS=(--k3s-arg "--disable=traefik@server:*"
 require docker k3d kubectl
 docker info >/dev/null 2>&1 || die "Docker is not running. Use the terminal of the dev container."
 
-# three nodes need about 1.5 to 2 GB of memory (WSL: see .wslconfig)
+# three nodes need about 1.5 to 2 GB of memory (Windows Subsystem for Linux,
+# WSL: see .wslconfig)
 # /proc/meminfo lists the memory of the machine in kB; awk takes the line
 # MemAvailable and prints its value in MB
 available=$(awk '/^MemAvailable/ { print int($2 / 1024) }' /proc/meminfo)
@@ -54,7 +55,8 @@ if k3d_cluster_exists "$CLUSTER"; then
     k3d cluster start "$CLUSTER"
 
     # after a rebuild of the dev container the kubeconfig entry is gone
-    k3d kubeconfig merge "$CLUSTER" --kubeconfig-merge-default --kubeconfig-switch-context >/dev/null
+    k3d kubeconfig merge "$CLUSTER" --kubeconfig-merge-default \
+                                    --kubeconfig-switch-context >/dev/null
 
     # created by an older version of this script?
     while read -r problem; do
@@ -68,14 +70,16 @@ else
     [[ -z "$users" ]] \
         || die "Port $HTTPS_PORT is taken by: $users(cluster net of an earlier gateway demo? ./cluster-recreate.sh deletes it)"
 
-    log "Creating cluster $CLUSTER with 1 server and $agents agents ($K3S_IMAGE) ..."
+    log "Creating cluster $CLUSTER with 1 server and $number_of_agents agents ($K3S_IMAGE) ..."
     # --no-lb: no load balancer container in front of the API, one server is
     # enough; the port goes straight to the server node
     # --port host:node@server:0:direct forwards port 8443 of the dev container
     # to node port 30443 of the first server node. "direct" publishes the port
     # on that node's container; the default "proxy" would need the load
     # balancer that --no-lb switches off.
-    k3d cluster create "$CLUSTER" --agents "$agents" --image "$K3S_IMAGE" --no-lb "${K3S_ARGS[@]}" \
+    k3d cluster create "$CLUSTER" --agents "$number_of_agents" \
+                                  --image "$K3S_IMAGE" \
+                                  --no-lb "${K3S_ARGS[@]}" \
                                   --port "$HTTPS_PORT:$GATEWAY_NODE_PORT@server:0:direct"
 fi
 

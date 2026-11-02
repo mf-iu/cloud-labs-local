@@ -27,7 +27,7 @@ curl --cacert ../.state/course-ca.crt --resolve placefinder.test:8443:127.0.0.1 
 `gateway-up.sh` baut die Demo aus Termin 4 nach:
 
 1. Cluster `pf` aus [03-kubernetes](../03-kubernetes/README.md), angelegt oder gestartet mit `cluster-up.sh`. Port 8443 des Dev Containers führt auf Port 30443 des Server-Nodes.
-2. Die Gateway API besteht aus Ressourcentypen (CRDs) des Kubernetes-Projekts – `GatewayClass`, `Gateway`, `HTTPRoute` – und einer Implementierung. Das Skript installiert die Typen in Version 1.6.1 und Traefik mit Helm als Implementierung (`k8s/traefik-values.yaml`); Traefik legt die GatewayClass `traefik` an und lauscht auf Node-Port 30443.
+2. Die Gateway API besteht aus Ressourcentypen (Custom Resource Definitions, CRDs) des Kubernetes-Projekts – `GatewayClass`, `Gateway`, `HTTPRoute` – und einer Implementierung. Das Skript installiert die Typen in Version 1.6.1 und Traefik mit Helm als Implementierung (`k8s/traefik-values.yaml`); Traefik legt die GatewayClass `traefik` an und lauscht auf Node-Port 30443.
 3. PlaceFinder mit dem Manifest aus Termin 3 (`deploy/k8s/` im Repository `placefinder`); fehlt das Image, baut es `../03-kubernetes/load-image.sh`.
 4. cert-manager mit Helm, Gateway-API-Unterstützung über `k8s/cert-manager-values.yaml`.
 5. Eine eigene Kurs-CA in `../.state/course-ca.crt` (30 Tage gültig, wird danach neu angelegt) als Secret für den ClusterIssuer `k8s/issuer.yaml`.

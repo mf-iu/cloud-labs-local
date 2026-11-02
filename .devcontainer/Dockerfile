@@ -73,8 +73,9 @@ RUN case "$(dpkg --print-architecture)" in \
  && tar --extract --gzip --file /tmp/trivy.tar.gz --directory /usr/local/bin trivy \
  && rm /tmp/trivy.tar.gz
 
-# Syft lists the packages of an image (SBOM), cosign signs and verifies
-# images (T02, T08). Pinned versions with checksums, like Trivy.
+# Syft lists the packages of an image (Software Bill of Materials, SBOM), cosign
+# signs and verifies images (T02, T08). Pinned versions with checksums, like
+# Trivy.
 RUN arch="$(dpkg --print-architecture)" \
  && case "$arch" in \
       amd64) syft_sum="$SYFT_SHA256_AMD64"; cosign_sum="$COSIGN_SHA256_AMD64" ;; \
@@ -91,7 +92,7 @@ RUN arch="$(dpkg --print-architecture)" \
  && chmod 755 /usr/local/bin/cosign \
  && rm /tmp/syft.tar.gz
 
-# Mount point for the SSH keys of WSL and the parent of further mount points
-# (see devcontainer.json), owned by the container user, so that Docker does
-# not create them as root
+# Mount point for the SSH keys of Windows Subsystem for Linux (WSL) and the
+# parent of further mount points (see devcontainer.json), owned by the container
+# user, so that Docker does not create them as root
 RUN install --directory --owner vscode --group vscode /home/vscode/.ssh /home/vscode/.config

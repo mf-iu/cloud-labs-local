@@ -1,5 +1,6 @@
 -- osm2pgsql flex style for PlaceFinder: points of interest from OpenStreetMap.
--- Used by load-pois.sh. Data © OpenStreetMap contributors, ODbL 1.0.
+-- Used by load-pois.sh. Data © OpenStreetMap contributors, Open Database
+-- License (ODbL) 1.0.
 -- Only named nodes with an amenity or tourism tag; POIs mapped as areas
 -- (ways), e.g. many schools and museums, would need process_way.
 

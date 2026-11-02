@@ -373,8 +373,9 @@ wait_for_http() {
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-# Download a GeoNames dump (CC BY 4.0) into .state/data and print the path of
-# its text file, e.g. download_geonames DE -> .state/data/DE.txt
+# Download a GeoNames dump (Creative Commons Attribution, CC BY 4.0) into
+# .state/data and print the path of its text file, e.g. download_geonames DE ->
+# .state/data/DE.txt
 # download_geonames <name>
 download_geonames() {
     local name=$1 txt="$DATA_DIR/$1.txt"
