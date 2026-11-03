@@ -27,7 +27,7 @@ Die Schritte bauen aufeinander auf; jeder nennt, was er voraussetzt und mit welc
 | [03-kubernetes](03-kubernetes/README.md) | Cluster `pf` mit k3d, Manifest, Rolling Update, ConfigMap, Helm, Autoscaler | 02 | `t03` |
 | [04-cluster-network](04-cluster-network/README.md) | Gateway API mit Traefik, HTTPS mit cert-manager, NetworkPolicies, Diagnose | 03 | `t03` |
 | [05-rest-api](05-rest-api/README.md) | Filter ergänzen, Smoke-Test lokal und über das Gateway, Vertragstests | 01, 04 | `t05` |
-| [06-postgis](06-postgis/README.md) | PostGIS mit Compose, Orte laden, Abfragen mit und ohne Index | 02, 05 | `t06` |
+| [06-postgis](06-postgis/README.md) | PostGIS mit Compose, Orte laden, PlaceFinder mit PostGIS; Vergleich zur Datenbank beim Anbieter | 02, 05 | `t06` |
 | [07-cache-and-storage](07-cache-and-storage/README.md) | Valkey als Cache und Geo-Index, SeaweedFS mit Pre-Signed URLs, Kacheln als PMTiles | 06 | `t07` |
 | [08-iac-and-operations](08-iac-and-operations/README.md) | OpenTofu mit Docker, Pipeline im eigenen Fork, Beobachtbarkeit mit Grafana | 02, 07 | `t08` |
 

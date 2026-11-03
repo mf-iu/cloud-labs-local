@@ -1,6 +1,6 @@
 # 06 – PostgreSQL mit PostGIS
 
-**Ziel:** PostgreSQL 18 mit den Erweiterungen PostGIS und pg_trgm läuft als Dienst `db` in der `compose.yaml` von PlaceFinder. Die Tabelle `places` enthält GeoNames `cities15000`; räumliche und unscharfe Abfragen laufen einmal mit und einmal ohne Index. PlaceFinder (Stand `t06`) liest die Orte aus dieser Datenbank; der Smoke-Test zeigt, dass die API gleich bleibt.
+**Ziel:** PostgreSQL 18 mit den Erweiterungen PostGIS und pg_trgm läuft als Dienst `db` in der `compose.yaml` von PlaceFinder. Die Tabelle `places` enthält GeoNames `cities15000`. PlaceFinder (Stand `t06`) liest die Orte aus dieser Datenbank; der Smoke-Test zeigt, dass die API gleich bleibt. Dieselben Skripte laden und prüfen in Termin 6 die verwaltete Datenbank beim Anbieter – die lokale Datenbank liefert die Vergleichswerte. Abfragen mit und ohne Index sind Zusatz.
 
 **Baut auf:** [02-container](../02-container/README.md) (Compose), [05-rest-api](../05-rest-api/README.md) (Smoke-Test) · **Stand:** `t06` (Version 0.6.0) · **Kosten:** keine
 
@@ -13,9 +13,9 @@
 
 Alle Skripte nutzen `DATABASE_URL`, wenn die Variable gesetzt ist, sonst die lokale Datenbank `postgresql://pf:pf@localhost:5432/pf`. So arbeiten sie unverändert mit jeder PostgreSQL-Datenbank; das Anbieter-Repository ruft sie im Schritt `05-storage` mit `with-db.sh` und der Adresse der verwalteten Datenbank auf.
 
-## Im Termin: GeoNames in PostGIS, Abfragen, PlaceFinder
+## Im Termin: lokal zum Vergleich, PlaceFinder
 
-Die Übung von Termin 6 ist rein lokal und dauert rund 60 Minuten. Der Foliensatz `T06_Lab-Skripte` erklärt die Skripte.
+Die Übung von Termin 6 findet beim eigenen Anbieter statt: Im Anbieter-Repository legt `05-storage/create-db.sh` eine verwaltete Datenbank an, `with-db.sh` ruft die Skripte dieses Ordners mit ihr auf (Anleitung im README von `05-storage`). Die lokale Datenbank hier liefert die Vergleichswerte; beides zusammen dauert rund 60 Minuten. Der Foliensatz `T06_Lab-Skripte` erklärt die Skripte.
 
 ### Datenbank mit Compose
 
@@ -54,8 +54,10 @@ docker compose up --detach db   # docker compose ps zeigt db als healthy
 cd /workspaces/cloud-labs-local/06-postgis
 export PGOPTIONS="--jit=off --max_parallel_workers_per_gather=0"   # einfache Pläne
 ./load-cities.sh          # cities15000 laden, Tabelle und Indizes anlegen, wenige Sekunden
-./query.sh                # Beispielabfragen aus queries.sql
+./query.sh                # Beispielabfragen aus queries.sql – die Vergleichswerte
 ```
+
+Die Zeiten notieren und mit `./with-db.sh query.sh` im Anbieter-Repository vergleichen: Die Pläne sind gleich, aber jede Abfrage geht dort durchs Internet.
 
 Liegt `cities15000.txt` im Kursnetz bereit, nach `../.state/data/` kopieren; sonst lädt `load-cities.sh` die Datei von GeoNames (ca. 3 MB, Lizenz CC BY 4.0).
 
@@ -68,27 +70,6 @@ Liegt `cities15000.txt` im Kursnetz bereit, nach `../.state/data/` kopieren; son
 | `places_all_names_trgm_idx` | GIN mit Trigrammen auf allen Namen | Namenssuche von PlaceFinder, auch über `alternatenames` (München → Munich) | ca. 19 MB |
 
 Die Tabelle selbst ist rund 11 MB groß. Der Index auf allen Namen ist größer als die Tabelle, weil große Städte Hunderte von Schreibweisen haben – Indizes kosten Speicher. Sein Ausdruck muss genau dem in `src/placefinder/db.py` (`ALL_NAMES`) entsprechen, sonst nutzt PostgreSQL ihn nicht.
-
-`queries.sql` enthält:
-
-1. die zehn nächsten Orte zu Erfurt (KNN-Suche mit `<->`),
-2. eine Suche über `asciiname` ohne und mit B-Baum-Index (der Index wird mit `ROLLBACK` wieder entfernt),
-3. alle Orte im Umkreis von 50 km mit `EXPLAIN ANALYZE` (Bitmap Index Scan),
-4. dieselbe Umkreisabfrage mit abgeschaltetem Index (Seq Scan) zum Vergleich,
-5. eine unscharfe Suche „Wuerzburg“ → „Würzburg“.
-
-**Die Falle** von Hand ausprobieren – `ST_Distance` im `WHERE` nutzt keinen Index:
-
-```bash
-./query.sh --interactive
-```
-
-```sql
-EXPLAIN ANALYZE SELECT name FROM places
-WHERE ST_Distance(geom, ST_MakePoint(11.03, 50.98)::geography) < 50000;   -- Seq Scan
-```
-
-Die Zeiten mit und ohne Index notieren; sie gehören in die Zwischenpräsentation (Teil 6 „Datenbank“).
 
 ### PlaceFinder mit der Datenbank
 
@@ -103,6 +84,8 @@ git fetch upstream --tags                # Tag t06 der Musterlösung holen
 git switch --detach t06
 ../cloud-labs-local/06-postgis/test-api.sh   # endet mit "All checks passed" und drei Zeiten
 ```
+
+Mit der Datenbank beim Anbieter: im Anbieter-Repository `cd 05-storage && ./with-db.sh test-api.sh` – derselbe Smoke-Test, die Antwortzeiten zeigen den Weg durchs Internet.
 
 Von Hand, etwa für die Karte (`http://localhost:5173/?api=http://localhost:8000`):
 
@@ -135,7 +118,7 @@ git switch -          # zurück zum vorherigen Zweig, z. B. filter aus Termin 5
 
 ### Fragen zum Weiterdenken
 
-- Warum ist die Abfrage mit Index schneller, obwohl beide dieselbe Funktion `ST_DWithin` verwenden?
+- Warum ist `Execution Time` lokal und beim Anbieter ähnlich, die Antwortzeit von `test-api.sh` aber nicht?
 - Warum öffnet PlaceFinder einen Pool von Verbindungen beim Start, statt für jede Anfrage eine neue Verbindung aufzubauen?
 - Was übernimmt eine verwaltete Datenbank in der Cloud gegenüber diesem Container (Backups, Updates, Failover)?
 
@@ -145,7 +128,7 @@ Freiwillig und ohne Folgen für spätere Termine.
 
 ### Eigenes PostgisRepository
 
-Statt der Musterlösung den eigenen Stand von PlaceFinder auf PostGIS umstellen: in `src/placefinder/db.py` ein `PostgisRepository` mit `find`, `get` und `count` nach dem Vorbild von `PlaceRepository`, zuerst für die Umkreissuche (Foliensatz `T06_Datenspeicherung`, Folie „Umkreissuche aus PostGIS“).
+Statt der Musterlösung den eigenen Stand von PlaceFinder auf PostGIS umstellen: in `src/placefinder/db.py` ein `PostgisRepository` mit `find`, `get` und `count` nach dem Vorbild von `PlaceRepository`, zuerst für die Umkreissuche (Foliensatz `T06_Lab-Skripte`, Folie „PlaceFinder: ein Repository, zwei Implementierungen“).
 
 ```bash
 uv add "psycopg[binary]" psycopg-pool   # Anführungszeichen wegen der eckigen Klammern
@@ -177,8 +160,27 @@ Bei `allCountries` dauern Import und Indizes einige Minuten und belegen mehrere 
 
 Für spätere Updates mit `osm2pgsql-replication` muss der Import mit `--slim` laufen. Daten © OpenStreetMap contributors, ODbL.
 
-### Datenbank beim Anbieter
+### Abfragen mit und ohne Index
 
-Im Anbieter-Repository legt `05-storage/create-db.sh` PostgreSQL 18 mit PostGIS beim eigenen Anbieter an; `with-db.sh` ruft die Skripte dieses Ordners mit dieser Datenbank auf (`./with-db.sh load-cities.sh`, `./with-db.sh test-api.sh`). Anleitung im README von `05-storage`; danach `destroy-db.sh`.
+Datenbankwissen zum Auffrischen; Grundlage ist die lokale Datenbank aus dem Abschnitt „Im Termin“.
+
+`queries.sql` enthält:
+
+1. die zehn nächsten Orte zu Erfurt (KNN-Suche mit `<->`),
+2. eine Suche über `asciiname` ohne und mit B-Baum-Index (der Index wird mit `ROLLBACK` wieder entfernt),
+3. alle Orte im Umkreis von 50 km mit `EXPLAIN ANALYZE` (Bitmap Index Scan),
+4. dieselbe Umkreisabfrage mit abgeschaltetem Index (Seq Scan) zum Vergleich,
+5. eine unscharfe Suche „Wuerzburg“ → „Würzburg“.
+
+**Die Falle** von Hand ausprobieren – `ST_Distance` im `WHERE` nutzt keinen Index:
+
+```bash
+./query.sh --interactive
+```
+
+```sql
+EXPLAIN ANALYZE SELECT name FROM places
+WHERE ST_Distance(geom, ST_MakePoint(11.03, 50.98)::geography) < 50000;   -- Seq Scan
+```
 
 Weiter mit [07-cache-and-storage](../07-cache-and-storage/README.md).
